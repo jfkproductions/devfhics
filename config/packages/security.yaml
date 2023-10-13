@@ -1,0 +1,29 @@
+security:
+  providers:
+    auth0_provider:
+      id: Auth0\Symfony\Security\UserProvider
+
+  firewalls:
+    # auth0:
+    #   pattern: ^/private$ # A pattern example for stateful (session-based authentication) route requests
+    #   provider: auth0_provider
+    #   custom_authenticators:
+    #     - auth0.authenticator
+    api: # ThisisAVeryLongPasswordYouKnow!
+      pattern: ^/api # A pattern example for stateless (token-based authorization) route requests
+      stateless: true
+      provider: auth0_provider
+      custom_authenticators:
+        - auth0.authorizer
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    main:
+      lazy: true
+
+  access_control:
+    - { path: ^/api/admin/public$, roles: PUBLIC_ACCESS } # PUBLIC_ACCESS is a special role that allows everyone to access the path.
+    - { path: ^/api/admin, roles: ROLE_ADMIN_READ } # This route will expect the given access token to have the `admin:read` scope in order to access it.
+    - { path: ^/api$, roles: PUBLIC_ACCESS } # PUBLIC_ACCESS is a special role that allows everyone to access the path.
+    - { path: ^/api/scoped$, roles: ROLE_USING_TOKEN } # The ROLE_USING_TOKEN role is added by the Auth0 SDK to any request that includes a valid access token.
+    - { path: ^/api/scoped$, roles: ROLE_READ_MESSAGES } # This route will expect the given access token to have the `read:messages` scope in order to access it.
